@@ -4,12 +4,15 @@ import { useEffect, useRef, useState } from 'react';
 import { Camera } from 'expo-camera';
 import { shareAsync } from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
+//import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 
 export default function App() {
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
   const [photo, setPhoto] = useState();
+
+  //const TensorCamera = cameraWithTensors(Camera);
 
   useEffect(() => {
     (async () => {
@@ -61,9 +64,11 @@ export default function App() {
   }
 
   return (
+    //Replace here with TensorCamera code
+
     <Camera style={styles.container} ref={cameraRef}>
       <View style={styles.buttonContainer}>
-        <Button title="Consultar patente" onPress={takePic} />
+        <Button title="Patente" onPress={takePic} />
       </View>
       <StatusBar style="auto" />
     </Camera>

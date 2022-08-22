@@ -4,12 +4,15 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button, Image, SafeAreaView } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import { useEffect, useRef, useState } from 'react';
+//import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 
 export default function App() {
   let cameraRef = useRef();
   const [cameraPermissions, setCameraPermissions] = useState();
   const [libraryPermissions, setLibraryPermissions] = useState();
   const [photo, setPhoto] = useState();
+
+  const TensorCamera = cameraWithTensors(Camera);
 
   useEffect(() => {
     (async() => {
@@ -62,12 +65,12 @@ export default function App() {
   }
 
   return (
-    <Camera style={styles.container} ref={cameraRef} >
+    <TensorCamera style={styles.container} ref={cameraRef} >
       <View style={styles.buttonContainer}>
         <Button title='Tomar foto' onpress={takePic} />
       </View>
       <StatusBar style="auto" />
-    </Camera>
+    </TensorCamera>
   );
 }
 

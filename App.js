@@ -5,12 +5,21 @@ import { Camera } from 'expo-camera';
 import { shareAsync } from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
+import * as mobilenet from '@tensorflow-models/mobilenet';
+import * as tf from "@tensorflow/tfjs";
+
+
+const initialiseTensorflow = async () => {
+  await tf.ready();
+  tf.getBackend();
+}
 
 export default function App() {
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
   const [photo, setPhoto] = useState();
+  const [net, setNet] = useState(mobilenet.MobileNet);
 
   const TensorCamera = cameraWithTensors(Camera);
 
@@ -22,9 +31,16 @@ export default function App() {
       const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
       setHasCameraPermission(cameraPermission.status === "granted");
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
+      // initialise Tensorflow
+      await initialiseTensorflow();
+      // load the model
+      setNet(await mobilenet.load());
     })();
   }, []);
 
+  if(!net){
+    return <Text>Model not loaded</Text>;
+  }
   if (hasCameraPermission === undefined) {
     return <Text>Requesting permissions...</Text>
   } else if (!hasCameraPermission) {
@@ -64,24 +80,14 @@ export default function App() {
       </SafeAreaView>
     );
   }
-
+  //ADD autorender={true} TO 
   return (
     //Replace here with TensorCamera code
     <SafeAreaView style={styles.container}>
-    <TensorCamera style={styles.preview} ref={cameraRef} />
+    <TensorCamera style={styles.preview} ref={cameraRef} autorender={true} onReady={() => {}} /> 
     <Button title="Consultar patente" onPress={takePic} />
   </SafeAreaView>//again no button :S are you sure we are using the same Button?
-
-// I dont see anything since you changed safeareaview yeaaaaa =) so happy =) now it's working no just need to deal with design I see now
-// don't forget to rate me.b eFstOFOR SURE. 5 STARS and also if need any assitance i will be available Thank you very much
-//
-   // <Camera style={styles.container} ref={cameraRef}>
-    //   <View style={styles.buttonContainer}>
-    //     <Button title="Patente" onPress={takePic} />
-    //   </View>
-    //   <StatusBar style="auto" />
-    // </Camera> nOW I SEE I NEED TO ADD VIEW
-  ); //NO BUTTON =(
+  ); 
 } 
  
 const styles = StyleSheet.create({
@@ -92,10 +98,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     backgroundColor: '#fff',
-    alignSelf: 'flex-end'
+    alignSelf: 'flex-start'
   },
   preview: {
     alignSelf: 'stretch',
-    flex: 0.8
+    flex: 0.9
   }
 });

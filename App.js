@@ -19,7 +19,7 @@ export default function App() {
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
   const [photo, setPhoto] = useState();
-  const [net, setNet] = useState(mobilenet.MobileNet);
+  const [net, setNet] = useState(mobilenet);
 
   const TensorCamera = cameraWithTensors(Camera);
 
@@ -39,7 +39,10 @@ export default function App() {
   }, []);
 
   if(!net){
-    return <Text>Model not loaded</Text>;
+    console.log('Modelo no ha cargado');
+  }
+  else {
+    console.log("Modelo cargado");
   }
   if (hasCameraPermission === undefined) {
     return <Text>Requesting permissions...</Text>
@@ -57,6 +60,31 @@ export default function App() {
     let newPhoto = await cameraRef.current.takePictureAsync(options);
     setPhoto(newPhoto);
   };
+  
+  const handleCameraStream = images => {
+    if (!images) {
+      console.log("Image not found!");
+    }
+    //console.log('Veamos' + JSON.stringify(images));
+    const loop = async () => {
+       if(net) {
+          console.log('dentro de loop async');
+          console.log(images);
+          const nextImageTensor = images.next().value;
+          console.log(nextImageTensor?'true':'false');
+         if(nextImageTensor) {
+            const objects = await net.classify(nextImageTensor);
+            console.log('holandaquetalca');
+            console.log(objects.map(object => object.className));
+            //here it may be correct to use tf.dispose(images)
+           tf.dispose([nextImageTensor]);
+         }
+       }
+        requestAnimationFrame(loop);
+    }
+    loop();
+} 
+
 
   if (photo) {
     let sharePic = () => {
@@ -80,12 +108,19 @@ export default function App() {
       </SafeAreaView>
     );
   }
-  //ADD autorender={true} TO 
-  return (
+  //console.log(net.model);
+  return ( 
     //Replace here with TensorCamera code
+    //TRY: onReady={imageAsTensors => handleCameraStream(imageAsTensors)}
+    //ADD: view displaying prediction
+
     <SafeAreaView style={styles.container}>
-    <TensorCamera style={styles.preview} ref={cameraRef} autorender={true} onReady={() => {}} /> 
+      <View>
+      <Text>Hola  </Text>
+      </View>
+    <TensorCamera style={styles.preview} ref={cameraRef} autorender={true} onReady={images => handleCameraStream(images)} /> 
     <Button title="Consultar patente" onPress={takePic} />
+    
   </SafeAreaView>//again no button :S are you sure we are using the same Button?
   ); 
 } 

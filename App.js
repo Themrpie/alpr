@@ -5,11 +5,14 @@ import { Button } from 'react-native';
 import { LoadingView } from "./src/LoadingView";
 import { ModelView } from "./src/ModelView";
 import { useTensorFlowLoaded } from "./src/useTensorFlow";
+import { LogBox } from 'react-native';
+
+LogBox.ignoreAllLogs();
 
 export default function App() {
   const isLoaded = useTensorFlowLoaded();
   const [permission, requestPermission] = Camera.useCameraPermissions();
-
+  
   if (!permission?.granted) {
     return (
       <LoadingView message="Camera permission is required to continue">

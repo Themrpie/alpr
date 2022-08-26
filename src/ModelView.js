@@ -1,4 +1,8 @@
 import * as mobilenet from '@tensorflow-models/mobilenet';
+import * as cocoSsd from '@tensorflow-models/coco-ssd';
+import '@tensorflow/tfjs-backend-webgl';
+import '@tensorflow/tfjs-backend-cpu';
+
 import { Camera } from 'expo-camera';
 import React from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -9,9 +13,12 @@ import { PredictionList } from './PredictionList';
 import { useTensorFlowModel } from './useTensorFlow';
 
 export function ModelView() {
-  const model = useTensorFlowModel(mobilenet);
+  const model = useTensorFlowModel(cocoSsd);
   const [predictions, setPredictions] = React.useState([]);
-
+  
+  //console.log(frame % computeRecognitionEveryNFrames === 0);
+  //WARNING:
+  //console.disableYellowBox = true;
   if (!model) {
     return <LoadingView message="Cargando modelo en TensorFlow" />;
   }
@@ -37,14 +44,24 @@ function ModelCamera({ model, setPredictions }) {
       cancelAnimationFrame(raf.current);
     };
   }, []);
-
+ //mobilenet: await model.classify(nextImageTensor, 1); 
+ //coco-ssd: await model.detect(nextImageTensor);
+  
   const onReady = React.useCallback(
     (images) => {
+      
       const loop = async () => {
-        const nextImageTensor = images.next().value;
-        const predictions = await model.classify(nextImageTensor, 1);
-        setPredictions(predictions);
-        raf.current = requestAnimationFrame(loop);
+        let frame = 0;
+        const computeRecognitionEveryNFrames = 60;
+        if(frame % computeRecognitionEveryNFrames === 0){
+          const nextImageTensor = images.next().value;
+          const predictions = await model.detect(nextImageTensor);
+          setPredictions(predictions);
+          console.log(predictions);
+          raf.current = requestAnimationFrame(loop); 
+        }
+        frame += 1;
+        //frame = frame % computeRecognitionEveryNFrames;
       };
       loop();
     },

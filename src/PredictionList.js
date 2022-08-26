@@ -1,13 +1,14 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-//{'Probabilidad: ' + p.probability.toFixed(2)}
+//mobilenet:  {'Objeto: ' + p.className + ' Probabilidad: ' + p.probability.toFixed(2) }
+//coco-ssd:  {'Objeto: ' + p.class + ' Probabilidad: ' + p.score.toFixed(2) }
 export function PredictionList({ predictions = [] }) {
   return (
     <View style={styles.container}>
       {predictions.map((p, i) => (        
         <Text style={styles.text} key={`item-${i}`}>
-          {'Objeto: ' + p.className + ' Probabilidad: ' + p.probability.toFixed(2) }
+          {'Objeto: ' + p.class + ' Probabilidad: ' + p.score.toFixed(2) }
         </Text>
         
       ))}

@@ -61,7 +61,7 @@ function ModelCamera({ model, setPredictions }) {
           raf.current = requestAnimationFrame(loop); 
         }
         frame += 1;
-        //frame = frame % computeRecognitionEveryNFrames;
+        frame = frame % computeRecognitionEveryNFrames;
       };
       loop();
     },
@@ -86,4 +86,5 @@ const styles = StyleSheet.create({
   camera: {
     zIndex: 0,
   },
+  
 });
